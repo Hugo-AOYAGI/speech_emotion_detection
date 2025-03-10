@@ -1,0 +1,6 @@
+PySoundFile
+tqdm
+transformers
+kagglehub
+torchaudio
+pytorch
