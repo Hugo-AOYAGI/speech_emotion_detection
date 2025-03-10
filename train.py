@@ -42,7 +42,6 @@ def train(
         model.train()
 
         for i, (waveform, emotion) in enumerate(train_loader):
-            progress.set_postfix_str(f"Batch {i + 1}/{len(train_loader)}")
 
             waveform = waveform.to(params.device)
             emotion = emotion.to(params.device)
@@ -56,6 +55,10 @@ def train(
             optimizer.step()
 
             training_loss += loss.item()
+
+            progress.set_postfix_str(
+                f"Batch {i + 1}/{len(train_loader)}, Loss: {loss.item()}"
+            )
 
         with torch.no_grad():
             model.eval()
@@ -71,11 +74,11 @@ def train(
                 validation_loss += loss.item()
                 validation_accuracy += (prediction.argmax(1) == emotion).float().mean()
 
-        progress.set_description(
-            f"Epoch {epoch + 1}/{params.epochs} "
-            f"Training Loss: {training_loss / len(train_loader)} "
-            f"Validation Loss: {validation_loss / len(valid_loader)} "
-            f"Validation Accuracy: {validation_accuracy / len(valid_loader)}"
+        print(
+            f"Epoch {epoch + 1}/{params.epochs}\n",
+            f"Training Loss: {training_loss / len(train_loader)}\n",
+            f"Validation Loss: {validation_loss / len(valid_loader)}\n",
+            f"Validation Accuracy: {validation_accuracy / len(valid_loader)}\n",
         )
 
     return model

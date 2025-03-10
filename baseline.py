@@ -13,13 +13,15 @@ class EmotionRecognitionBaseline(torch.nn.Module):
 
         self.model = AutoModel.from_pretrained("facebook/hubert-base-ls960")
 
-        self.classifier = torch.nn.Linear(self.model.config.hidden_size, n_classes)
+        self.linear = torch.nn.Linear(self.model.config.hidden_size, 512)
+        self.classifier = torch.nn.Linear(512, n_classes)
         self.softmax = torch.nn.Softmax(dim=1)
 
     def forward(self, waveform):
         features = self.model(waveform).last_hidden_state[:, 0, :]
-        output = self.classifier(features)
-        return self.softmax(output)
+        output = self.linear(features)
+        output = self.classifier(output)
+        return output
 
 
 if __name__ == "__main__":
