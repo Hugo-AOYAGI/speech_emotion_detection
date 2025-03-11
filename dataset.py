@@ -17,6 +17,7 @@ EMOTIONS = {
     6: "disgust",
     7: "surprise",
 }
+SAMPLE_RATE = 16000
 
 
 class RavdessDataset(torch.utils.data.Dataset):
@@ -50,6 +51,9 @@ class RavdessDataset(torch.utils.data.Dataset):
         for audio_file_path in tqdm.tqdm(audio_file_paths, desc="Loading Audio Files"):
             # Load the audio file using torchaudio
             waveform, sample_rate = torchaudio.load(audio_file_path, format="wav")
+            waveform = torchaudio.transforms.Resample(
+                orig_freq=sample_rate, new_freq=SAMPLE_RATE
+            )(waveform)
             if waveform.shape[0] > 1:  # If dual-channel, convert to mono
                 waveform = waveform.mean(0, keepdim=True)
             self.waveforms.append(waveform.squeeze(0))
@@ -74,7 +78,7 @@ if __name__ == "__main__":
     audio_dataset = RavdessDataset()
     print("Dataset size:", len(audio_dataset))
 
-    print("Sample rate:", audio_dataset.sample_rate)
+    print("Original sample rate:", audio_dataset.sample_rate)
 
     # Load the first audio file
     print("Loading the first audio file")

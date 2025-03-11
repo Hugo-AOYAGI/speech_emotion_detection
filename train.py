@@ -2,6 +2,7 @@ import dataset
 from dataclasses import dataclass
 import torch
 import tqdm
+import traceback
 
 
 @dataclass
@@ -12,7 +13,7 @@ class TrainingParameters:
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
 
 
-def train(
+def train_ser(
     train_dataset: dataset.RavdessDataset,
     valid_dataset: dataset.RavdessDataset,
     model: torch.nn.Module,
@@ -20,7 +21,9 @@ def train(
 ):
     """Training function for Emotion Recognition model"""
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=params.learning_rate)
+    optimizer = torch.optim.Adam(
+        model.parameters(), lr=params.learning_rate, weight_decay=0.01
+    )
     loss_fn = torch.nn.CrossEntropyLoss()
 
     train_loader = torch.utils.data.DataLoader(
@@ -87,8 +90,8 @@ def train(
     # Save the model if training is interrupted
     except KeyboardInterrupt:
         print("Training interrupted")
-        torch.save(model.state_dict(), "model.pth")
+        return model
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(traceback.format_exc())
 
     return model
