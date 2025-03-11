@@ -34,51 +34,61 @@ def train(
     print(f"Training on {params.device}")
     model = model.to(params.device)
 
-    for epoch in (progress := tqdm.tqdm(range(params.epochs))):
-        training_loss = 0.0
-        validation_loss = 0.0
-        validation_accuracy = 0.0
+    try:
+        for epoch in (progress := tqdm.tqdm(range(params.epochs))):
+            training_loss = 0.0
+            validation_loss = 0.0
+            validation_accuracy = 0.0
 
-        model.train()
+            model.train()
 
-        for i, (waveform, emotion) in enumerate(train_loader):
-
-            waveform = waveform.to(params.device)
-            emotion = emotion.to(params.device)
-
-            prediction = model(waveform)
-
-            loss = loss_fn(prediction, emotion)
-
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-
-            training_loss += loss.item()
-
-            progress.set_postfix_str(
-                f"Batch {i + 1}/{len(train_loader)}, Loss: {loss.item()}"
-            )
-
-        with torch.no_grad():
-            model.eval()
-            for i, (waveform, emotion) in enumerate(valid_loader):
-                progress.set_postfix_str(f"Batch {i + 1}/{len(train_loader)}")
+            for i, (waveform, emotion) in enumerate(train_loader):
 
                 waveform = waveform.to(params.device)
                 emotion = emotion.to(params.device)
 
                 prediction = model(waveform)
+
                 loss = loss_fn(prediction, emotion)
 
-                validation_loss += loss.item()
-                validation_accuracy += (prediction.argmax(1) == emotion).float().mean()
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
 
-        print(
-            f"Epoch {epoch + 1}/{params.epochs}\n",
-            f"Training Loss: {training_loss / len(train_loader)}\n",
-            f"Validation Loss: {validation_loss / len(valid_loader)}\n",
-            f"Validation Accuracy: {validation_accuracy / len(valid_loader)}\n",
-        )
+                training_loss += loss.item()
+
+                progress.set_postfix_str(
+                    f"Batch {i + 1}/{len(train_loader)}, Loss: {loss.item()}"
+                )
+
+            with torch.no_grad():
+                model.eval()
+                for i, (waveform, emotion) in enumerate(valid_loader):
+                    progress.set_postfix_str(f"Batch {i + 1}/{len(train_loader)}")
+
+                    waveform = waveform.to(params.device)
+                    emotion = emotion.to(params.device)
+
+                    prediction = model(waveform)
+                    loss = loss_fn(prediction, emotion)
+
+                    validation_loss += loss.item()
+                    validation_accuracy += (
+                        (prediction.argmax(1) == emotion).float().mean()
+                    )
+
+            print(
+                f"Epoch {epoch + 1}/{params.epochs}\n",
+                f"Training Loss: {training_loss / len(train_loader)}\n",
+                f"Validation Loss: {validation_loss / len(valid_loader)}\n",
+                f"Validation Accuracy: {validation_accuracy / len(valid_loader)}\n",
+            )
+
+    # Save the model if training is interrupted
+    except KeyboardInterrupt:
+        print("Training interrupted")
+        torch.save(model.state_dict(), "model.pth")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
     return model
