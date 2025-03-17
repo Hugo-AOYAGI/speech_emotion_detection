@@ -1,5 +1,6 @@
 from models.hubert import *
 from models.wav2vec import *
+from models.audio_features import *
 from train import *
 from dataset import *
 import click
@@ -20,7 +21,7 @@ def main():
 @click.option(
     "--model_type",
     default="wav2vec",
-    type=click.Choice(["wav2vec", "hubert"]),
+    type=click.Choice(["wav2vec", "hubert", "audio_features"]),
     help="Type of model to train.",
 )
 @click.option("--model_path", default=None, help="Path to the model.")
@@ -39,6 +40,8 @@ def train(
             model = EmotionRecognitionWav2Vec()
         case "hubert":
             model = EmotionRecognitionHubert()
+        case "audio_features":
+            model = AudioFeaturesModel()
         case _:
             raise ValueError("Model type not supported.")
 
@@ -68,7 +71,7 @@ def train(
 @click.option(
     "--model_type",
     default="wav2vec",
-    type=click.Choice(["wav2vec", "hubert"]),
+    type=click.Choice(["wav2vec", "hubert", "audio_features"]),
     help="Type of model to test.",
 )
 @click.option(
@@ -84,6 +87,8 @@ def test(model_type: str, model_path: str, batch_size: int, device: str):
             model = EmotionRecognitionWav2Vec()
         case "hubert":
             model = EmotionRecognitionHubert()
+        case "audio_features":
+            model = AudioFeaturesModel()
         case _:
             raise ValueError("Model type not supported.")
 

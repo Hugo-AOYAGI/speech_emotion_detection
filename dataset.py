@@ -23,7 +23,11 @@ SAMPLE_RATE = 16000
 class RavdessDataset(torch.utils.data.Dataset):
     """Custom class for the Ravdess Audio dataset taken from Kaggle"""
 
-    def __init__(self):
+    def __init__(self, minimal: bool = False):
+        """
+        Args:
+            minimal (bool, optional): If True, only load a few examples. Defaults to False.
+        """
         super(RavdessDataset, self).__init__()
 
         self.path = kagglehub.dataset_download(DATASET_URL)
@@ -48,9 +52,17 @@ class RavdessDataset(torch.utils.data.Dataset):
                 self.emotions.append(int(part[2]) - 1)
                 audio_file_paths.append(os.path.join(self.path, dir, file))
 
-        for audio_file_path in tqdm.tqdm(audio_file_paths, desc="Loading Audio Files"):
+        for i, audio_file_path in tqdm.tqdm(
+            enumerate(audio_file_paths), desc="Loading Audio Files"
+        ):
+            # If minimal is True, only load a few examples
+            if minimal and i > 10:
+                break
+
             # Load the audio file using torchaudio
-            waveform, sample_rate = torchaudio.load(audio_file_path, format="wav")
+            waveform, sample_rate = torchaudio.load(
+                audio_file_path, format="wav", normalize=True
+            )
             waveform = torchaudio.transforms.Resample(
                 orig_freq=sample_rate, new_freq=SAMPLE_RATE
             )(waveform)
