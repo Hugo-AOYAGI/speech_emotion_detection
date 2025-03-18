@@ -52,10 +52,8 @@
               };
             };
           };
-
           python312Packages = final.python312.pkgs;
         })
-
       ];
 
       forAllSystems = nixpkgs.lib.genAttrs systems;
@@ -97,10 +95,6 @@
               ]
             ))
           ];
-
-          MPLBACKEND = "GTK3Agg";
-          CUDA_HOME = pkgs.cudatoolkit;
-          TORCH_CUDA_ARCH_LIST = "8.6"; # Compute capability of RTX 3050
         }
       );
     };

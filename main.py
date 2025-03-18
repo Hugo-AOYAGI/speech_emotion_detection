@@ -1,11 +1,12 @@
+import click
+import torch
+
+from dataset import *
+from models.audio_features import *
 from models.hubert import *
 from models.wav2vec import *
-from models.audio_features import *
+from tests import test as test_model
 from train import *
-from dataset import *
-import click
-
-import torch
 
 
 @click.group()
@@ -101,7 +102,7 @@ def test(model_type: str, model_path: str, batch_size: int, device: str):
     audio_dataset = RavdessDataset()
     _, test_dataset = audio_dataset.random_split(0.8, 0.2)
 
-    loss, accuracy = test(model, test_dataset, device, batch_size)
+    loss, accuracy = test_model(model, test_dataset, device, batch_size)
 
     print(f"Loss: {loss}, Accuracy: {accuracy}")
 
