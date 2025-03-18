@@ -1,8 +1,8 @@
 import os
-import kagglehub
-import torchaudio
 
+import kagglehub
 import torch
+import torchaudio
 import tqdm
 
 # RADVESS dataset path taken from Kaggle
@@ -52,6 +52,7 @@ class RavdessDataset(torch.utils.data.Dataset):
                 self.emotions.append(int(part[2]) - 1)
                 audio_file_paths.append(os.path.join(self.path, dir, file))
 
+        sample_rate = -1
         for i, audio_file_path in tqdm.tqdm(
             enumerate(audio_file_paths), desc="Loading Audio Files"
         ):
@@ -73,6 +74,7 @@ class RavdessDataset(torch.utils.data.Dataset):
         self.waveforms = torch.nn.utils.rnn.pad_sequence(
             self.waveforms, batch_first=True
         )
+        assert sample_rate != -1, "No audio file paths"
 
         self.sample_rate = sample_rate
 

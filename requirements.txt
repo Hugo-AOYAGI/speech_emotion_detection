@@ -2,3 +2,6 @@ PySoundFile
 tqdm
 transformers
 kagglehub
+click
+torch
+torchaudio
