@@ -18,6 +18,7 @@ EMOTIONS = {
     7: "surprise",
 }
 SAMPLE_RATE = 16000
+_CACHE_PATH = "checkpoints/dataset.pt"
 
 
 class RavdessDataset(torch.utils.data.Dataset):
@@ -29,6 +30,14 @@ class RavdessDataset(torch.utils.data.Dataset):
             minimal (bool, optional): If True, only load a few examples. Defaults to False.
         """
         super(RavdessDataset, self).__init__()
+
+        if os.path.exists(_CACHE_PATH):
+
+            data = torch.load(_CACHE_PATH)
+            self.waveforms = data["waveforms"]
+            self.emotions = data["emotions"]
+            self.sample_rate = data["sample_rate"]
+            return
 
         self.path = kagglehub.dataset_download(DATASET_URL)
         ravdess_directory_list = os.listdir(self.path)
@@ -75,8 +84,14 @@ class RavdessDataset(torch.utils.data.Dataset):
             self.waveforms, batch_first=True
         )
         assert sample_rate != -1, "No audio file paths"
-
         self.sample_rate = sample_rate
+
+        data = {
+            "waveforms": self.waveforms,
+            "emotions": self.emotions,
+            "sample_rate": sample_rate,
+        }
+        torch.save(data, _CACHE_PATH)
 
     def random_split(self, train_size, valid_size):
         return torch.utils.data.random_split(self, [train_size, valid_size])
