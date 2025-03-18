@@ -100,6 +100,7 @@
                 pysoundfile
                 kagglehub
                 matplotlib
+                speechbrain
               ]
             ))
           ];
