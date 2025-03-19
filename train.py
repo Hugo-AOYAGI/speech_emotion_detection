@@ -1,9 +1,10 @@
-import dataset
+import traceback
 from dataclasses import dataclass
+
 import torch
 import tqdm
-import traceback
-import logging
+
+import dataset
 
 
 @dataclass
@@ -37,6 +38,9 @@ def train_ser(
 
     print(f"Training on {params.device}")
     model = model.to(params.device)
+
+    best_validation_accuracy = 0.0
+    best_model = None
 
     try:
         for epoch in (progress := tqdm.tqdm(range(params.epochs))):
@@ -81,6 +85,10 @@ def train_ser(
                         (prediction.argmax(1) == emotion).float().mean()
                     )
 
+                if validation_accuracy > best_validation_accuracy:
+                    best_validation_accuracy = validation_accuracy
+                    best_model = model.state_dict().copy()
+
             print(
                 f"Epoch {epoch + 1}/{params.epochs}\n",
                 f"Training Loss: {training_loss / len(train_loader)}\n",
@@ -91,7 +99,7 @@ def train_ser(
     # Save the model if training is interrupted
     except KeyboardInterrupt:
         print("Training interrupted")
-        return model
+        return best_model
     except Exception as e:
         print(traceback.format_exc())
 
