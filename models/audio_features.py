@@ -43,21 +43,21 @@ class AudioFeaturesModel(torch.nn.Module):
         self.conv1 = torch.nn.Conv1d(
             in_channels=self.n_mfcc + 2,
             out_channels=32,
-            kernel_size=7,
+            kernel_size=3,
             padding=4,
             stride=2,
         )
         self.conv2 = torch.nn.Conv1d(
             in_channels=32,
             out_channels=64,
-            kernel_size=5,
+            kernel_size=3,
             padding=4,
             stride=2,
         )
         self.conv3 = torch.nn.Conv1d(
             in_channels=64,
             out_channels=128,
-            kernel_size=5,
+            kernel_size=3,
             padding=4,
             stride=2,
         )
