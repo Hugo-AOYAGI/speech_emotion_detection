@@ -10,6 +10,7 @@ from models.hubert import *
 from models.majority_vote import MajorityVote
 from models.speechbrain import SpeechBrain
 from models.wav2vec import *
+from models.whisper import *
 from tests import test as test_model
 from train import *
 
@@ -27,7 +28,7 @@ def main():
 @click.option(
     "--model_type",
     default="wav2vec",
-    type=click.Choice(["wav2vec", "hubert", "audio_features", "ast", "speechbrain"]),
+    type=click.Choice(["wav2vec", "hubert", "audio_features", "ast", "speechbrain","whisper"]),
     help="Type of model to train.",
 )
 @click.option("--model_path", default=None, help="Path to the model.")
@@ -52,6 +53,8 @@ def train(
             model = AST()
         case "speechbrain":
             model = SpeechBrain(device=device)
+        case "whisper":
+            model = EmotionRecognitionWhisper()
         case _:
             raise ValueError("Model type not supported.")
 

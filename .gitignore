@@ -4,3 +4,5 @@ __pycache__/
 .pth
 /.direnv
 /pretrained_models
+res.txt
+emotion_recognition_model.pth
