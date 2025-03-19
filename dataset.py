@@ -120,5 +120,5 @@ if __name__ == "__main__":
     print("Emotion:", EMOTIONS[emotion])
 
     print("Splitting the dataset into training and validation")
-    train_dataset, valid_dataset = audio_dataset.random_split(0.8, 0.2)
+    train_dataset, valid_dataset = audio_dataset.random_split()
     print("Train and valid dataset size:", len(train_dataset), len(valid_dataset))
