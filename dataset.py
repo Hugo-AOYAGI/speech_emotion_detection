@@ -20,6 +20,8 @@ EMOTIONS = {
 SAMPLE_RATE = 16000
 _CACHE_PATH = "checkpoints/dataset.pt"
 
+torch.manual_seed(42)
+
 
 class RavdessDataset(torch.utils.data.Dataset):
     """Custom class for the Ravdess Audio dataset taken from Kaggle"""
@@ -93,8 +95,10 @@ class RavdessDataset(torch.utils.data.Dataset):
         }
         torch.save(data, _CACHE_PATH)
 
-    def random_split(self, train_size, valid_size):
-        return torch.utils.data.random_split(self, [train_size, valid_size])
+    def random_split(self) -> tuple["RavdessDataset", "RavdessDataset"]:
+        """Split the dataset into training and validation sets, in that order"""
+        torch.manual_seed(torch.initial_seed())
+        return torch.utils.data.random_split(self, [0.8, 0.2])  # type: ignore
 
     def __len__(self):
         return len(self.waveforms)

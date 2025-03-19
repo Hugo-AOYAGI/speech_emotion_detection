@@ -1,6 +1,9 @@
 """Majority Vote model to combine the outputs"""
 
+from typing import Literal
+
 import torch
+import torch.nn.functional as F
 from torch import Tensor, nn
 
 
@@ -24,11 +27,18 @@ class MajorityVote(nn.Module):
         instance.weights = weights
         return instance
 
-    def forward(self, x: Tensor):
+    def forward(self, x: Tensor, method: Literal["softmax", "vote"] = "softmax"):
+        """Directly the prediction class."""
 
         results = torch.zeros((len(x), self.n_classes), device=x.device)
 
         for coeff, model in zip(self.weights, self.models):
+            match method:
+                case "softmax":
+                    results += F.softmax(model(x), dim=-1) * coeff
+                case "vote":
+                    result = model(x)
+                    results += (result.max() == result) * coeff
             results += model(x) * coeff
 
-        return results
+        return results.argmax(-1)
