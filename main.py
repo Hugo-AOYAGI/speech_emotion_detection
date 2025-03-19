@@ -1,7 +1,6 @@
 import click
 import torch
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 
 from dataset import *
 from models.ast import AST
@@ -130,7 +129,8 @@ def test(model_type: str, model_path: str, batch_size: int, device: str):
     type=click.Choice(["vote", "softmax"]),
     help="Type of majority vote.",
 )
-def majority_vote(type: str):
+@click.option("--device", default="cpu", help="Device to run the testing on.")
+def majority_vote(type: str, device: str):
     # Load models on the CPU
     ast = AST().eval()
     hubert = EmotionRecognitionHubert().eval()
@@ -139,6 +139,10 @@ def majority_vote(type: str):
     ast.load_state_dict(torch.load("checkpoints/ast.pth"))
     hubert.load_state_dict(torch.load("checkpoints/hubert.pth"))
     wav2vec.load_state_dict(torch.load("checkpoints/wav2vec.pth"))
+
+    ast.to(device)
+    hubert.to(device)
+    wav2vec.to(device)
 
     # Create a Majority Vote model
     majority_vote = MajorityVote([ast, hubert, wav2vec])
@@ -152,8 +156,8 @@ def majority_vote(type: str):
     total = 0
 
     with torch.no_grad():
-        for waveform, emotion in tqdm(loader):
-            prediction = majority_vote(waveform, method=type)
+        for waveform, emotion in tqdm.tqdm(loader):
+            prediction = majority_vote(waveform.to(device), method=type).cpu()
             correct += (prediction == emotion).sum().item()
             total += len(emotion)
 
