@@ -75,7 +75,7 @@ def train(
 
     train_ser(train_dataset, valid_dataset, model, params)
 
-    torch.save(model.state_dict(), "emotion_recognition_model.pth")
+    torch.save(model.state_dict(), f"{model_type}.pth")
 
 
 @main.command()
