@@ -1,6 +1,7 @@
-import dataset
 import torch
 import tqdm
+
+import dataset
 
 
 def test(
@@ -21,6 +22,7 @@ def test(
     model = model.to(device)
 
     accuracy = 0.0
+    loss = 0.0
 
     model.eval()
     with torch.no_grad():
@@ -30,7 +32,7 @@ def test(
 
             prediction = model(waveform)
 
-            loss = loss_fn(prediction, emotion)
+            loss += loss_fn(prediction, emotion).item()
 
             accuracy += (prediction.argmax(1) == emotion).float().mean().item()
 
@@ -38,4 +40,4 @@ def test(
                 f"Batch {i + 1}/{len(test_loader)}, Loss: {loss.item()}, Accuracy: {accuracy / (i + 1)}"
             )
 
-    return loss.item(), accuracy / len(test_loader)
+    return loss, accuracy / len(test_loader)

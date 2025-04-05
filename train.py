@@ -1,3 +1,4 @@
+import json
 import traceback
 from dataclasses import dataclass
 
@@ -13,6 +14,13 @@ class TrainingParameters:
     learning_rate: float = 0.001
     batch_size: int = 16
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
+
+
+def write_log(filename: str, data: dict):
+    """Write logs to a jsonl file"""
+
+    with open(filename, "a") as f:
+        f.write(json.dumps(data) + "\n")
 
 
 def train_ser(
@@ -42,9 +50,12 @@ def train_ser(
     best_validation_accuracy = 0.0
     best_model = None
 
+    # TODO : mettre des logs jsonl
+
     try:
         for epoch in (progress := tqdm.tqdm(range(params.epochs))):
             training_loss = 0.0
+            training_accuracy = 0.0
             validation_loss = 0.0
             validation_accuracy = 0.0
 
@@ -64,10 +75,15 @@ def train_ser(
                 optimizer.step()
 
                 training_loss += loss.item()
+                training_accuracy += (prediction.argmax(1) == emotion).float().mean()
 
                 progress.set_postfix_str(
                     f"Batch {i + 1}/{len(train_loader)}, Loss: {loss.item()}"
                 )
+
+            write_log(
+                "train.jsonl", {"loss": training_loss, "accuracy": training_accuracy}
+            )
 
             with torch.no_grad():
                 model.eval()
@@ -88,6 +104,14 @@ def train_ser(
                 if validation_accuracy > best_validation_accuracy:
                     best_validation_accuracy = validation_accuracy
                     best_model = model.state_dict().copy()
+
+            write_log(
+                "test.jsonl",
+                {
+                    "loss": validation_loss,
+                    "accuracy": validation_accuracy,
+                },
+            )
 
             print(
                 f"Epoch {epoch + 1}/{params.epochs}\n",

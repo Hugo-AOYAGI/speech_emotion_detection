@@ -10,6 +10,7 @@ from models.majority_vote import MajorityVote
 from models.speechbrain import SpeechBrain
 from models.wav2vec import *
 from models.whisper import *
+from plot import plot_logs
 from tests import test as test_model
 from train import *
 
@@ -27,7 +28,9 @@ def main():
 @click.option(
     "--model_type",
     default="wav2vec",
-    type=click.Choice(["wav2vec", "hubert", "audio_features", "ast", "speechbrain","whisper"]),
+    type=click.Choice(
+        ["wav2vec", "hubert", "audio_features", "ast", "speechbrain", "whisper"]
+    ),
     help="Type of model to train.",
 )
 @click.option("--model_path", default=None, help="Path to the model.")
@@ -162,6 +165,15 @@ def majority_vote(type: str, device: str):
             total += len(emotion)
 
     print(f"Accuracy: {correct / total}")
+
+
+@main.command()
+@click.argument("train", type=click.Path(exists=True))
+@click.argument("test", type=click.Path(exists=True))
+def plot(train: str, test: str):
+    """Plot on the same graph the training and validation accuracies"""
+
+    plot_logs(train, test)
 
 
 if __name__ == "__main__":
