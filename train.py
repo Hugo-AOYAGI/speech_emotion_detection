@@ -50,8 +50,6 @@ def train_ser(
     best_validation_accuracy = 0.0
     best_model = None
 
-    # TODO : mettre des logs jsonl
-
     try:
         for epoch in (progress := tqdm.tqdm(range(params.epochs))):
             training_loss = 0.0
@@ -75,14 +73,17 @@ def train_ser(
                 optimizer.step()
 
                 training_loss += loss.item()
-                training_accuracy += (prediction.argmax(1) == emotion).float().mean()
+                training_accuracy += (
+                    (prediction.argmax(1) == emotion).float().mean().item()
+                )
 
                 progress.set_postfix_str(
                     f"Batch {i + 1}/{len(train_loader)}, Loss: {loss.item()}"
                 )
 
             write_log(
-                "train.jsonl", {"loss": training_loss, "accuracy": training_accuracy}
+                "train.jsonl",
+                {"loss": training_loss, "accuracy": training_accuracy},
             )
 
             with torch.no_grad():
@@ -99,7 +100,7 @@ def train_ser(
                     validation_loss += loss.item()
                     validation_accuracy += (
                         (prediction.argmax(1) == emotion).float().mean()
-                    )
+                    ).item()
 
                 if validation_accuracy > best_validation_accuracy:
                     best_validation_accuracy = validation_accuracy

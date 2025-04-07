@@ -1,7 +1,8 @@
 checkpoints/
 __pycache__/
 
-.pth
+*.pth
+*.jsonl
 /.direnv
 /pretrained_models
 res.txt
