@@ -75,7 +75,7 @@ def train(
         epochs=epochs, learning_rate=learning_rate, batch_size=batch_size, device=device
     )
 
-    train_ser(train_dataset, valid_dataset, model, params)
+    train_ser(train_dataset, valid_dataset, model, model_type, params)
 
     torch.save(model.state_dict(), f"{model_type}.pth")
 

@@ -27,6 +27,7 @@ def train_ser(
     train_dataset: dataset.RavdessDataset,
     valid_dataset: dataset.RavdessDataset,
     model: torch.nn.Module,
+    model_name: str,
     params: TrainingParameters,
 ):
     """Training function for Emotion Recognition model"""
@@ -82,8 +83,11 @@ def train_ser(
                 )
 
             write_log(
-                "train.jsonl",
-                {"loss": training_loss, "accuracy": training_accuracy},
+                f"{model_name}-train.jsonl",
+                {
+                    "loss": training_loss / len(train_loader),
+                    "accuracy": training_accuracy / len(train_loader),
+                },
             )
 
             with torch.no_grad():
@@ -107,10 +111,10 @@ def train_ser(
                     best_model = model.state_dict().copy()
 
             write_log(
-                "test.jsonl",
+                f"{model_name}-test.jsonl",
                 {
-                    "loss": validation_loss,
-                    "accuracy": validation_accuracy,
+                    "loss": validation_loss / len(valid_loader),
+                    "accuracy": validation_accuracy / len(valid_loader),
                 },
             )
 

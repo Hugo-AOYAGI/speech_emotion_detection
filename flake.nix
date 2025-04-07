@@ -101,6 +101,7 @@
                 kagglehub
                 matplotlib
                 speechbrain
+                pygobject3
               ]
             ))
           ];
