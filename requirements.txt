@@ -6,3 +6,4 @@ click
 torch
 torchaudio
 speechbrain
+matplotlib
