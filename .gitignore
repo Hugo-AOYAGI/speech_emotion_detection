@@ -5,4 +5,4 @@ __pycache__/
 *.jsonl
 /.direnv
 /pretrained_models
-res.txt
+*.txt

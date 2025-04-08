@@ -18,9 +18,9 @@ class SpeechBrain(nn.Module):
         )  # type: ignore
 
         self.head = nn.Sequential(
-            nn.Linear(512, 128),
+            nn.Linear(192, 64),
             nn.ReLU(),
-            nn.Linear(128, n_classes),
+            nn.Linear(64, n_classes),
         )
 
     def forward(self, x: Tensor):

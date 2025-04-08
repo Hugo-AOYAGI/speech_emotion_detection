@@ -86,7 +86,9 @@ def train(
 @click.option(
     "--model_type",
     default="wav2vec",
-    type=click.Choice(["wav2vec", "hubert", "audio_features", "ast", "speechbrain"]),
+    type=click.Choice(
+        ["wav2vec", "hubert", "audio_features", "ast", "speechbrain", "whisper"]
+    ),
     help="Type of model to test.",
 )
 @click.option(
@@ -108,6 +110,8 @@ def test(model_type: str, model_path: str, batch_size: int, device: str):
             model = AST()
         case "speechbrain":
             model = SpeechBrain(device=device)
+        case "whisper":
+            model = EmotionRecognitionWhisper()
         case _:
             raise ValueError("Model type not supported.")
 
