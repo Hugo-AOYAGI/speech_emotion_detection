@@ -170,10 +170,11 @@ def majority_vote(type: str, device: str):
 @main.command()
 @click.argument("train", type=click.Path(exists=True))
 @click.argument("test", type=click.Path(exists=True))
-def plot(train: str, test: str):
+@click.option("--epochs", type=int, default=None, help="Number of epochs to plot.")
+def plot(train: str, test: str, epochs: int | None):
     """Plot on the same graph the training and validation accuracies"""
 
-    plot_logs(train, test)
+    plot_logs(train, test, epochs)
 
 
 if __name__ == "__main__":
